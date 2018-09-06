@@ -27,8 +27,22 @@ const generatePolicy = (principalId, effect, resource) => {
 }
 
 module.exports.auth = (event, context, callback) => {
-    // 9OJniHzRsRCApQbWy70gPfAbpHlPa8uc
-    callback(null, generatePolicy('demo-user', 'Allow', event.methodArn));
+    if (!event.authorizationToken) {
+        callback('Unauthorized')
+    }
+
+    const tokenParts = event.authorizationToken.split(' ');
+    const tokenValue = tokenParts[1];
+
+    if (!(tokenParts[0].toLowerCase() === 'Bearer' && tokenValue)) {
+        callback('Unauthorized');
+    }
+
+    if (tokenValue !== '9OJniHzRsRCApQbWy70gPfAbpHlPa8uc') {
+        callback(null, generatePolicy('demo-user', 'Allow', event.methodArn));
+    } else {
+        callback('Unauthorized');
+    }
 };
 
 module.exports.getAllStatuses = (event, context, callback) => {
