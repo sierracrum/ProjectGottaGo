@@ -1,4 +1,4 @@
-module.exports.getAllDoorStatuses = (event, context, callback) => {
+module.exports.getAllStatuses = (event, context, callback) => {
 
 }
 

@@ -16,8 +16,8 @@ custom:
   webpackIncludeModules: true
 
 functions:
-  getAllDoorStatuses:
-    handler: handler.getAllDoorStatuses
+  getAllStatuses:
+    handler: handler.getAllStatuses
     vpc:
       securityGroupIds:
         - sg-0a3b2b5396c02d4bc
@@ -27,7 +27,7 @@ functions:
         - subnet-1bf65062
     events:
       - http:
-          path: door/status
+          path: status
           method: GET
           cors: true
           integration: lambda
@@ -42,7 +42,7 @@ functions:
         - subnet-1bf65062
     events:
       - http:
-          path: door/status/{id}
+          path: status/{id}
           method: GET
           cors: true
           integration: lambda
@@ -57,7 +57,7 @@ functions:
         - subnet-1bf65062
     events:
       - http:
-          path: door/status
+          path: status
           method: POST
           cors: true
           integration: lambda
