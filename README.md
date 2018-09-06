@@ -16,7 +16,10 @@ A Slack bot that tells you if bathrooms are available and optionally notifies yo
 
 
 ## API / Slackbot
-Node.js app running in Lambda with API Gateway
+Node.js app running in Lambda with API Gateway and Dynamo DB back end
+
+### Setup ###
+
 
 ### Endpoints ###
 > post /status
