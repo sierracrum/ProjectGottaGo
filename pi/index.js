@@ -1,3 +1,4 @@
+require('dotenv').load();
 var gpio = require('rpi-gpio');
 var doorpin = 7; //the GPIO port you connected to the cicruit
 var server = email.server.connect({
