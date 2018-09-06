@@ -1,19 +1,4 @@
-// const express = require("express");
-// const parser = require("body-parser");
-
-// const app = express();
-// const PORT = 3000;
-
-// app.listen(PORT, error => {
-//   if (error) {
-//     console.log(error);
-//   } else {
-//     console.log("SERVER CONNECTED");
-//   }
-// });
-
 var gpio = require('rpi-gpio');
-var email = require("emailjs/email");
 var doorpin = 7; //the GPIO port you connected to the cicruit
 var server = email.server.connect({
   user: "Username",
