@@ -40,9 +40,9 @@ module.exports.auth = (event, context, callback) => {
     // }
 
     // if (tokenValue !== '9OJniHzRsRCApQbWy70gPfAbpHlPa8uc') {
-        callback(null, generatePolicy('demo-user', 'Allow', event.methodArn));
+    callback(null, generatePolicy('demo-user', 'Allow', event.methodArn));
     //} else {
-        //callback('Unauthorized');
+    //callback('Unauthorized');
     //}
 };
 
@@ -58,7 +58,7 @@ module.exports.getAllStatuses = (event, context, callback) => {
             'dt'
         ]
     };
-    
+
     dynamoDb.scan(params, (error, result) => {
         if (error) {
             console.log(error);
@@ -119,27 +119,27 @@ module.exports.createStatus = (event, context, callback) => {
     const params = {
         TableName: dbTableName,
         Item: {
-            'id': {S: uuid.v1()},
-            'buildingId': {N: data.buildingId.toString()},
-            'floorId' : {N: data.floorId.toString()},
-            'doorId' : {N: data.doorId.toString()},
-            'status' : {N: data.status.toString()},
-            'dt' : {S: new Date().getTime().toString()}
+            'id': { S: uuid.v1() },
+            'buildingId': { N: data.buildingId.toString() },
+            'floorId': { N: data.floorId.toString() },
+            'doorId': { N: data.doorId.toString() },
+            'status': { N: data.status.toString() },
+            'dt': { S: new Date().getTime().toString() }
         }
     };
     const dynamoDb = new AWS.DynamoDB();
-    dynamoDb.putItem(params, function(error, data) {
+    dynamoDb.putItem(params, function (error, data) {
         if (error) {
             console.log(error);
             callback('Failed storing status', error);
         } else {
             callback(null, true);
         }
-    }); 
+    });
 }
 
 module.exports.slackStatus = (event, context, callback) => {
-    
+
     const params = {
         TableName: dbTableName,
         AttributesToGet: [
@@ -177,7 +177,7 @@ module.exports.slackStatus = (event, context, callback) => {
 
             // get only the last door record
             itemsSorted.map((item) => {
-                const index = _.findIndex(floors, {floorId: item.floorId});
+                const index = _.findIndex(floors, { floorId: item.floorId });
                 if (index === -1) {
                     floors.push(item);
                 }
@@ -192,10 +192,37 @@ module.exports.slackStatus = (event, context, callback) => {
                 "text": "Available Bathrooms: ",
                 "attachments": [
                     {
-                        "text":openFloorTxt,
+                        "text": openFloorTxt,
                         "callback_id": "notify",
                         "color": "#3AA3E3",
-                        "attachment_type": "default"
+                        "attachment_type": "default",
+                        "actions": [
+                            {
+                                "name": "notify",
+                                "text": "Notify All",
+                                "style": "danger",
+                                "type": "button",
+                                "value": "all"
+                            },
+                            {
+                                "name": "notify",
+                                "text": "Notify F1",
+                                "type": "button",
+                                "value": "F1"
+                            },
+                            {
+                                "name": "notify",
+                                "text": "Notify F2",
+                                "type": "button",
+                                "value": "F2"
+                            },
+                            {
+                                "name": "notify",
+                                "text": "Notify F3",
+                                "type": "button",
+                                "value": "F3"
+                            }
+                        ]
                     }
                 ]
             };
