@@ -1,5 +1,15 @@
 
-service: inractive-api-user
+service: riskalyze-gottogo
+
+custom:
+  webpackIncludeModules: true
+  dotenv:
+    path: .env
+    include:
+      - DYANMODB_TABLE
+      - AWS_REGION
+      - AWS_KEY
+      - AWS_SECRET
 
 provider:
   name: aws
@@ -9,13 +19,14 @@ provider:
   stage: dev
 
 plugins:
+  - serverless-dynamodb-local
   - serverless-webpack
   - serverless-offline
-
-custom:
-  webpackIncludeModules: true
+  - serverless-dotenv-plugin
 
 functions:
+  auth:
+    handler: handler.auth
   getAllStatuses:
     handler: handler.getAllStatuses
     vpc:
@@ -31,6 +42,7 @@ functions:
           method: GET
           cors: true
           integration: lambda
+          authorizer: auth
   getStatusById:
     handler: handler.getStatusById
     vpc:
@@ -46,6 +58,7 @@ functions:
           method: GET
           cors: true
           integration: lambda
+          authorizer: auth
   createStatus:
     handler: handler.createStatus
     vpc:
@@ -61,3 +74,4 @@ functions:
           method: POST
           cors: true
           integration: lambda
+          authorizer: auth

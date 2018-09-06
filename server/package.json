@@ -5,15 +5,17 @@
   "main": "serverless.yml",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "serverless offline start --port=3004"
+    "start": "serverless offline start --port=4000"
   },
   "author": "Riskalyze Hackathon",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.309.0",
+    "axios": "^0.18.0",
     "lodash": "^4.17.5",
-    "mysql": "^2.15.0",
-    "aws-sdk": "^2.202.0",
-    "axios": "^0.18.0"
+    "serverless-dotenv-plugin": "^1.2.0",
+    "serverless-dynamodb-local": "^0.2.18",
+    "uuid": "^3.3.2"
   },
   "devDependencies": {
     "babel-core": "^6.25.0",
