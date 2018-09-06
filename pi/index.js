@@ -20,7 +20,7 @@ function readInput() {
           console.log(error);
         });
     }
-    laststate = value;
+    value === true ? (laststate = 1) : (laststate = 0);
   });
   setTimeout(readInput, 1000); //recheck door every second
 }
