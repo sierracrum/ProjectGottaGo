@@ -1,0 +1,77 @@
+
+service: riskalyze-gottogo
+
+custom:
+  webpackIncludeModules: true
+  dotenv:
+    path: .env
+    include:
+      - DYANMODB_TABLE
+      - AWS_REGION
+      - AWS_KEY
+      - AWS_SECRET
+
+provider:
+  name: aws
+  runtime: nodejs6.10
+  profile: inractiveServerless
+  region: us-west-2
+  stage: dev
+
+plugins:
+  - serverless-dynamodb-local
+  - serverless-webpack
+  - serverless-offline
+  - serverless-dotenv-plugin
+
+functions:
+  auth:
+    handler: handler.auth
+  getAllStatuses:
+    handler: handler.getAllStatuses
+    vpc:
+      securityGroupIds:
+        - sg-0a3b2b5396c02d4bc
+      subnetIds:
+        - subnet-17e7265c
+        - subnet-e4ea69be
+        - subnet-1bf65062
+    events:
+      - http:
+          path: status
+          method: GET
+          cors: true
+          integration: lambda
+          authorizer: auth
+  getStatusById:
+    handler: handler.getStatusById
+    vpc:
+      securityGroupIds:
+        - sg-0a3b2b5396c02d4bc
+      subnetIds:
+        - subnet-17e7265c
+        - subnet-e4ea69be
+        - subnet-1bf65062
+    events:
+      - http:
+          path: status/{id}
+          method: GET
+          cors: true
+          integration: lambda
+          authorizer: auth
+  createStatus:
+    handler: handler.createStatus
+    vpc:
+      securityGroupIds:
+        - sg-0a3b2b5396c02d4bc
+      subnetIds:
+        - subnet-17e7265c
+        - subnet-e4ea69be
+        - subnet-1bf65062
+    events:
+      - http:
+          path: status
+          method: POST
+          cors: true
+          integration: lambda
+          authorizer: auth
