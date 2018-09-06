@@ -158,28 +158,47 @@ module.exports.slackStatus = (event, context, callback) => {
             callback('Failed getting status', error);
         } else {
 
+            let floors = [];
+            let openFloorTxt = '';
+            let items = [];
+
+            // sort
+            result.Items.map((item) => {
+                items.push({
+                    id: item.id.S,
+                    doorId: parseInt(item.doorId.N),
+                    floorId: parseInt(item.floorId.N),
+                    buildingId: parseInt(item.buildingId.N),
+                    status: parseInt(item.status.N),
+                    dt: item.dt.S
+                });
+            });
+            const itemsSorted = _.sortBy(items, 'dt').reverse();
+
+            // get only the last door record
+            itemsSorted.map((item) => {
+                const index = _.findIndex(floors, {floorId: item.floorId});
+                if (index === -1) {
+                    floors.push(item);
+                }
+            });
+
+            // get open doors
+            floors.map((floor) => {
+                openFloorTxt += `Elm F${floor.floorId}\n`
+            })
+
             let res = {
                 "text": "Available Bathrooms: ",
                 "attachments": [
                     {
-                        "text":"Elm F1 West\nElm F2 East"
+                        "text":openFloorTxt,
+                        "callback_id": "notify",
+                        "color": "#3AA3E3",
+                        "attachment_type": "default"
                     }
                 ]
             };
-
-            // sort data
-            // let items = [];
-            // result.Items.map((item) => {
-            //     items.push({
-            //         id: item.id.S,
-            //         doorId: parseInt(item.doorId.N),
-            //         floorId: parseInt(item.floorId.N),
-            //         buildingId: parseInt(item.buildingId.N),
-            //         status: parseInt(item.status.N),
-            //         dt: item.dt.S
-            //     });
-            // });
-            // const itemsSorted = _.sortBy(items, 'dt')
 
             callback(null, res);
         }
