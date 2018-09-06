@@ -7,15 +7,15 @@ custom:
     path: .env
     include:
       - DYANMODB_TABLE
-      - AWS_REGION
-      - AWS_KEY
-      - AWS_SECRET
+      - R_AWS_REGION
+      - R_AWS_KEY
+      - R_AWS_SECRET
       - AUTH_TOKEN
 
 provider:
   name: aws
   runtime: nodejs6.10
-  profile: inractiveServerless
+  profile: devServerless
   region: us-west-2
   stage: dev
 
@@ -36,7 +36,6 @@ functions:
           method: GET
           cors: true
           integration: lambda
-          authorizer: auth
   getStatusById:
     handler: handler.getStatusById
     events:
@@ -45,7 +44,6 @@ functions:
           method: GET
           cors: true
           integration: lambda
-          authorizer: auth
   createStatus:
     handler: handler.createStatus
     events:
@@ -54,4 +52,19 @@ functions:
           method: POST
           cors: true
           integration: lambda
-          authorizer: auth
+  slackStatus:
+    handler: handler.slackStatus
+    events:
+      - http:
+          path: status/slack
+          method: POST
+          cors: true
+          integration: lambda
+  slackStatusNotify:
+    handler: handler.slackStatusNotify
+    events:
+      - http:
+          path: status/slack/notify
+          method: POST
+          cors: true
+          integration: lambda
