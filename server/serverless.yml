@@ -10,6 +10,7 @@ custom:
       - AWS_REGION
       - AWS_KEY
       - AWS_SECRET
+      - AUTH_TOKEN
 
 provider:
   name: aws
@@ -29,13 +30,6 @@ functions:
     handler: handler.auth
   getAllStatuses:
     handler: handler.getAllStatuses
-    vpc:
-      securityGroupIds:
-        - sg-0a3b2b5396c02d4bc
-      subnetIds:
-        - subnet-17e7265c
-        - subnet-e4ea69be
-        - subnet-1bf65062
     events:
       - http:
           path: status
@@ -45,13 +39,6 @@ functions:
           authorizer: auth
   getStatusById:
     handler: handler.getStatusById
-    vpc:
-      securityGroupIds:
-        - sg-0a3b2b5396c02d4bc
-      subnetIds:
-        - subnet-17e7265c
-        - subnet-e4ea69be
-        - subnet-1bf65062
     events:
       - http:
           path: status/{id}
@@ -61,13 +48,6 @@ functions:
           authorizer: auth
   createStatus:
     handler: handler.createStatus
-    vpc:
-      securityGroupIds:
-        - sg-0a3b2b5396c02d4bc
-      subnetIds:
-        - subnet-17e7265c
-        - subnet-e4ea69be
-        - subnet-1bf65062
     events:
       - http:
           path: status
