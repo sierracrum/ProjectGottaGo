@@ -1,7 +1,8 @@
 const AWS = require("aws-sdk");
 const uuid = require("uuid");
 const _ = require("lodash");
-const dbTableName = "status";
+const dbTableNameStatus = "risk-gtg-status";
+const dbTableNameUser = "risk-gtg-user";
 // const dynamoDb = require('./db/dynamodb');
 AWS.config.update({
     region: process.env.R_AWS_REGION,
@@ -48,7 +49,7 @@ module.exports.auth = (event, context, callback) => {
 
 module.exports.getAllStatuses = (event, context, callback) => {
     const params = {
-        TableName: dbTableName,
+        TableName: dbTableNameStatus,
         AttributesToGet: [
             'id',
             'buildingId',
@@ -117,7 +118,7 @@ module.exports.createStatus = (event, context, callback) => {
     }
 
     const params = {
-        TableName: dbTableName,
+        TableName: dbTableNameStatus,
         Item: {
             'id': { S: uuid.v1() },
             'buildingId': { N: data.buildingId.toString() },
@@ -140,8 +141,10 @@ module.exports.createStatus = (event, context, callback) => {
 
 module.exports.slackStatus = (event, context, callback) => {
 
+    console.log('body', event.body);
+
     const params = {
-        TableName: dbTableName,
+        TableName: dbTableNameStatus,
         AttributesToGet: [
             'id',
             'buildingId',
@@ -177,7 +180,7 @@ module.exports.slackStatus = (event, context, callback) => {
 
             // get only the last door record
             itemsSorted.map((item) => {
-                const index = _.findIndex(floors, { floorId: item.floorId });
+                const index = _.findIndex(floors, { doorId: item.doorId, floorId: item.floorId });
                 if (index === -1) {
                     floors.push(item);
                 }
@@ -230,8 +233,31 @@ module.exports.slackStatus = (event, context, callback) => {
             callback(null, res);
         }
     });
+
 }
 
 module.exports.slackStatusNotify = (event, context, callback) => {
-    callback(null, true);
+    callback(null, event.body);
+
+    const data = JSON.parse(event.body);
+    const params = {
+        TableName: dbTableNameUser,
+        Item: {
+            'id': { S: uuid.v1() },
+            'userId': { N: data.payload.user.id },
+            'user': { S: data.payload.user.user },
+            'action': { S: data.actions[0].value },
+            'dt': { S: new Date().getTime().toString() }
+        }
+    };
+    const dynamoDb = new AWS.DynamoDB();
+    dynamoDb.putItem(params, function (error, data) {
+        if (error) {
+            console.log(error);
+            callback('Failed storing status', error);
+        } else {
+            callback(null, true);
+        }
+    });
+
 }
