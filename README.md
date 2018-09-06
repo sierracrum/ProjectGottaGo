@@ -21,7 +21,7 @@ Node.js app running in Lambda with API Gateway
 ### Endpoints ###
 > post /status
 
-Json Body
+JSON Body
 <pre>
 { "building": "Elm",
   "floor": "1",
