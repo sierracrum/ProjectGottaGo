@@ -3,16 +3,16 @@ A Slack bot that tells you if bathrooms are available and optionally notifies yo
 
 
 ## Components
-* Raspberry pi occupancy sensor
+* Raspberry Pi occupancy sensor
 * API to collect sensor data
 * Slack Bot
 * Database to store current status
 * UI
 
 ## Hardware Required ( per bathroom )
-* Raspberry pi (including power supply, case, SIM card, power supply)
+* Raspberry Pi (including power supply, case, SIM card)
 * Magnetic door sensor
-* wiring needed to connect door sensor to pi 
+* Wiring needed to connect door sensor to Pi 
 
 
 ## API / Slackbot
