@@ -2,6 +2,7 @@
  * A Bot for Slack!
  */
 
+require('dotenv').load();
 
 /**
  * Define a function for initiating a conversation on installation
