@@ -192,42 +192,42 @@ module.exports.slackStatus = (event, context, callback) => {
             })
 
             let res = {
-                "text": "Available Bathrooms: ",
+                "response_type": "in_channel",
                 "attachments": [
                     {
+                        "title": "There are bathrooms available!",
                         "text": openFloorTxt,
                         "callback_id": "notify",
-                        "color": "#3AA3E3",
+                        "color": "good",
                         "attachment_type": "default",
                         "actions": [
                             {
                                 "name": "notify",
-                                "text": "Notify All",
-                                "style": "danger",
-                                "type": "button",
-                                "value": "all"
-                            },
-                            {
-                                "name": "notify",
-                                "text": "Notify F1",
-                                "type": "button",
-                                "value": "F1"
-                            },
-                            {
-                                "name": "notify",
-                                "text": "Notify F2",
-                                "type": "button",
-                                "value": "F2"
-                            },
-                            {
-                                "name": "notify",
-                                "text": "Notify F3",
-                                "type": "button",
-                                "value": "F3"
+                                "text": "Pick a game...",
+                                "type": "select",
+                                "options": [
+                                    {
+                                        "text": "Any",
+                                        "value": "any"
+                                    },
+                                    {
+                                        "text": "1st Floor",
+                                        "value": "1"
+                                    },
+                                    {
+                                        "text": "2nd Floor",
+                                        "value": "2"
+                                    },
+                                    {
+                                        "text": "3rd Floor",
+                                        "value": "3"
+                                    }
+                                ]
                             }
                         ]
                     }
                 ]
+
             };
 
             callback(null, res);
