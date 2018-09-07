@@ -166,29 +166,33 @@ module.exports.createStatus = (event, context, callback) => {
 
                     // build messages
                     const messages = notificationLib.getUserMessages(result.Items, data.floorId);
-                    notificationLib.sendNotifications(messages, data.floorId, (error, res) => {
+                    if (messages.length) {
+                        notificationLib.sendNotifications(messages, data.floorId, (error, res) => {
 
-                        if (error) {
-                            console.log(error);
-                            callback('Failed sending messages', error);
-                        } else {
-                            
-                            notificationLib.deleteUsers(messages, dynamoDb, (error, res) => {
+                            if (error) {
+                                console.log(error);
+                                callback('Failed sending messages', error);
+                            } else {
+                                
+                                notificationLib.deleteUsers(messages, dynamoDb, (error, res) => {
 
-                                if (error) {
-                                    console.log(error);
-                                    callback('Failed deleting users', error);
-                                } else {
-                                    
-                                    callback(null, true);
+                                    if (error) {
+                                        console.log(error);
+                                        callback('Failed deleting users', error);
+                                    } else {
+                                        
+                                        callback(null, true);
 
-                                }
+                                    }
 
-                            });
+                                });
 
-                        }
+                            }
 
-                    });
+                        });
+                    } else {
+                        callback(null, true);
+                    }
 
                 }
             });
