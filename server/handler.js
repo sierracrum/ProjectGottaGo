@@ -173,14 +173,14 @@ module.exports.createStatus = (event, context, callback) => {
                                 console.log(error);
                                 callback('Failed sending messages', error);
                             } else {
-                                
+
                                 notificationLib.deleteUsers(messages, dynamoDb, (error, res) => {
 
                                     if (error) {
                                         console.log(error);
                                         callback('Failed deleting users', error);
                                     } else {
-                                        
+
                                         callback(null, true);
 
                                     }
@@ -256,9 +256,11 @@ module.exports.slackStatus = (event, context, callback) => {
             let availList = {};
             let availText = '';
             let unAvailList = [];
+            let availCount = 0;
 
             for (let i = 0; i < floors.length; i++) {
                 if (floors[i].status === 1) {
+                    availCount += 1;
                     if (availList[floors[i].floorId]) {
                         availList[floors[i].floorId]++;
                     } else {
@@ -277,7 +279,7 @@ module.exports.slackStatus = (event, context, callback) => {
 
             let gifURL = '';
             let resultTitle = '';
-            switch (Object.keys(availList).length) {
+            switch (availCount) {
                 case 0:
                     resultTitle = "Gotta wait, no bathrooms are available!"
                     gifURL = _.sample(noneAvailableGifs)
@@ -342,6 +344,7 @@ module.exports.slackStatus = (event, context, callback) => {
 module.exports.slackStatusNotify = (event, context, callback) => {
     const data = JSON.parse(event.body.payload);
     console.log(data);
+    console.log(data.actions[0].selected_options[0]);
     const params = {
         TableName: dbTableNameUser,
         Item: {
@@ -349,13 +352,13 @@ module.exports.slackStatusNotify = (event, context, callback) => {
                 S: uuid.v1()
             },
             'userId': {
-                N: data.payload.user.id
+                S: data.user.id
             },
             'userName': {
-                S: data.payload.user.name
+                S: data.user.name
             },
             'action': {
-                S: data.actions[0].value
+                S: data.actions[0].selected_options[0].value
             },
             'dt': {
                 S: new Date().getTime().toString()
@@ -368,7 +371,7 @@ module.exports.slackStatusNotify = (event, context, callback) => {
             console.log(error);
             callback('Failed storing status', error);
         } else {
-            callback(null, true);
+            callback(null, "I will notify you when a bathroom opens up");
         }
     });
 
