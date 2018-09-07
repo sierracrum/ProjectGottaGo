@@ -143,7 +143,7 @@ module.exports.createStatus = (event, context, callback) => {
         }
     };
     const dynamoDb = new AWS.DynamoDB();
-    dynamoDb.putItem(params, function (error, data) {
+    dynamoDb.putItem(params, function (error, putRes) {
         if (error) {
             console.log(error);
             callback('Failed storing status', error);
@@ -155,26 +155,27 @@ module.exports.createStatus = (event, context, callback) => {
                     'id',
                     'userId',
                     'userName',
+                    'action',
                     'dt'
                 ]
             };
-            dynamoDb.scan(params, (error, result) => {
+            dynamoDb.scan(params, (error, usersResult) => {
                 if (error) {
                     console.log(error);
                     callback('Failed fetching users', error);
                 } else {
 
                     // build messages
-                    const messages = notificationLib.getUserMessages(result.Items, data.floorId);
+                    const messages = notificationLib.getUserMessages(usersResult.Items, data.floorId);
                     if (messages.length) {
-                        notificationLib.sendNotifications(messages, data.floorId, (error, res) => {
+                        notificationLib.sendNotifications(messages, data.floorId, (error, notificationRes) => {
 
                             if (error) {
                                 console.log(error);
                                 callback('Failed sending messages', error);
                             } else {
 
-                                notificationLib.deleteUsers(messages, dynamoDb, (error, res) => {
+                                notificationLib.deleteUsers(messages, dynamoDb, dbTableNameUser, (error, deleteRes) => {
 
                                     if (error) {
                                         console.log(error);
@@ -285,7 +286,7 @@ module.exports.slackStatus = (event, context, callback) => {
                     gifURL = _.sample(noneAvailableGifs)
                     break;
                 case 1:
-                    resultTitle = "Gotta hurry, one bathrooms is available!"
+                    resultTitle = "Gotta hurry, one bathroom is available!"
                     gifURL = _.sample(oneAvailableGifs)
                     break;
                 default:
@@ -371,7 +372,7 @@ module.exports.slackStatusNotify = (event, context, callback) => {
             console.log(error);
             callback('Failed storing status', error);
         } else {
-            callback(null, "I will notify you when a bathroom opens up");
+            callback(null, 'I will notify you when a bathroom opens up');
         }
     });
 

@@ -4,17 +4,18 @@ const axios = require("axios");
 
 const getUserMessages = (users, floorId) => {
     let messages = [];
-    result.Items.map((user) => {
+    users.map((user) => {
+    
         const userId = user.userId.S;
-        const id = user.userId.S;
+        const id = user.id.S;
         const action = user.action.S;
 
         // check user action
-        if (action === 'any' || data.floorId === action) {
+        if (action === 'any' || floorId === parseInt(action)) {
             messages.push({
                 id: id,
                 userId: userId,
-                msg: `Bathrooms on floor ${data.floorId} are open`
+                msg: `A bathroom on floor ${floorId} is open!`
             })
         }
     });
@@ -29,10 +30,10 @@ const sendNotifications = (messages, floorId, cb) => {
                 'Content-Type': 'application/json'
             }
         }).then((res) => {
-            console.log('open res', res);
+            // console.log('open res', res);
             axios.post(`https://slack.com/api/chat.postMessage?token=${process.env.SLACK_TOKEN}&channel=${res.data.channel.id}&text=${message.msg}`)
             .then((res) => {
-                console.log('msg res', res)
+                // console.log('msg res', res)
                 callback(null, message);
             });
         });
@@ -48,7 +49,7 @@ const sendNotifications = (messages, floorId, cb) => {
     });
 };
 
-const deleteUsers = (messages, dynamoDb, cb) => {
+const deleteUsers = (messages, dynamoDb, dbTableNameUser, cb) => {
     async.map(messages, (message, callback) => {
 
         var params = {
