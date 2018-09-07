@@ -173,14 +173,14 @@ module.exports.createStatus = (event, context, callback) => {
                                 console.log(error);
                                 callback('Failed sending messages', error);
                             } else {
-                                
+
                                 notificationLib.deleteUsers(messages, dynamoDb, (error, res) => {
 
                                     if (error) {
                                         console.log(error);
                                         callback('Failed deleting users', error);
                                     } else {
-                                        
+
                                         callback(null, true);
 
                                     }
@@ -256,9 +256,11 @@ module.exports.slackStatus = (event, context, callback) => {
             let availList = {};
             let availText = '';
             let unAvailList = [];
+            let availCount = 0;
 
             for (let i = 0; i < floors.length; i++) {
                 if (floors[i].status === 1) {
+                    availCount += 1;
                     if (availList[floors[i].floorId]) {
                         availList[floors[i].floorId]++;
                     } else {
@@ -277,7 +279,7 @@ module.exports.slackStatus = (event, context, callback) => {
 
             let gifURL = '';
             let resultTitle = '';
-            switch (Object.keys(availList).length) {
+            switch (availCount) {
                 case 0:
                     resultTitle = "Gotta wait, no bathrooms are available!"
                     gifURL = _.sample(noneAvailableGifs)
