@@ -342,6 +342,7 @@ module.exports.slackStatus = (event, context, callback) => {
 module.exports.slackStatusNotify = (event, context, callback) => {
     const data = JSON.parse(event.body.payload);
     console.log(data);
+    console.log(data.actions[0].selected_options[0]);
     const params = {
         TableName: dbTableNameUser,
         Item: {
@@ -349,13 +350,13 @@ module.exports.slackStatusNotify = (event, context, callback) => {
                 S: uuid.v1()
             },
             'userId': {
-                N: data.payload.user.id
+                S: data.user.id
             },
             'userName': {
-                S: data.payload.user.name
+                S: data.user.name
             },
             'action': {
-                S: data.actions[0].value
+                S: data.actions[0].selected_options[0].value
             },
             'dt': {
                 S: new Date().getTime().toString()
@@ -368,7 +369,7 @@ module.exports.slackStatusNotify = (event, context, callback) => {
             console.log(error);
             callback('Failed storing status', error);
         } else {
-            callback(null, true);
+            callback(null, "I will notify you when a bathroom opens up");
         }
     });
 
