@@ -286,7 +286,7 @@ module.exports.slackStatus = (event, context, callback) => {
                     gifURL = _.sample(noneAvailableGifs)
                     break;
                 case 1:
-                    resultTitle = "Gotta hurry, one bathrooms is available!"
+                    resultTitle = "Gotta hurry, one bathroom is available!"
                     gifURL = _.sample(oneAvailableGifs)
                     break;
                 default:

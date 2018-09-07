@@ -4,7 +4,6 @@ const axios = require("axios");
 
 const getUserMessages = (users, floorId) => {
     let messages = [];
-    console.log(floorId);
     users.map((user) => {
     
         const userId = user.userId.S;
@@ -12,7 +11,7 @@ const getUserMessages = (users, floorId) => {
         const action = user.action.S;
 
         // check user action
-        if (action === 'any' || floorId === action) {
+        if (action === 'any' || floorId === parseInt(action)) {
             messages.push({
                 id: id,
                 userId: userId,
