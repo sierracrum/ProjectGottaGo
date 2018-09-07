@@ -143,7 +143,7 @@ module.exports.createStatus = (event, context, callback) => {
         }
     };
     const dynamoDb = new AWS.DynamoDB();
-    dynamoDb.putItem(params, function (error, data) {
+    dynamoDb.putItem(params, function (error, putRes) {
         if (error) {
             console.log(error);
             callback('Failed storing status', error);
@@ -155,26 +155,27 @@ module.exports.createStatus = (event, context, callback) => {
                     'id',
                     'userId',
                     'userName',
+                    'action',
                     'dt'
                 ]
             };
-            dynamoDb.scan(params, (error, result) => {
+            dynamoDb.scan(params, (error, usersResult) => {
                 if (error) {
                     console.log(error);
                     callback('Failed fetching users', error);
                 } else {
 
                     // build messages
-                    const messages = notificationLib.getUserMessages(result.Items, data.floorId);
+                    const messages = notificationLib.getUserMessages(usersResult.Items, data.floorId);
                     if (messages.length) {
-                        notificationLib.sendNotifications(messages, data.floorId, (error, res) => {
+                        notificationLib.sendNotifications(messages, data.floorId, (error, notificationRes) => {
 
                             if (error) {
                                 console.log(error);
                                 callback('Failed sending messages', error);
                             } else {
 
-                                notificationLib.deleteUsers(messages, dynamoDb, (error, res) => {
+                                notificationLib.deleteUsers(messages, dynamoDb, dbTableNameUser, (error, deleteRes) => {
 
                                     if (error) {
                                         console.log(error);
