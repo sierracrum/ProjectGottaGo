@@ -120,12 +120,24 @@ module.exports.createStatus = (event, context, callback) => {
     const params = {
         TableName: dbTableNameStatus,
         Item: {
-            'id': { S: uuid.v1() },
-            'buildingId': { N: data.buildingId.toString() },
-            'floorId': { N: data.floorId.toString() },
-            'doorId': { N: data.doorId.toString() },
-            'status': { N: data.status.toString() },
-            'dt': { S: new Date().getTime().toString() }
+            'id': {
+                S: uuid.v1()
+            },
+            'buildingId': {
+                N: data.buildingId.toString()
+            },
+            'floorId': {
+                N: data.floorId.toString()
+            },
+            'doorId': {
+                N: data.doorId.toString()
+            },
+            'status': {
+                N: data.status.toString()
+            },
+            'dt': {
+                S: new Date().getTime().toString()
+            }
         }
     };
     const dynamoDb = new AWS.DynamoDB();
@@ -231,54 +243,73 @@ module.exports.slackStatus = (event, context, callback) => {
 
             // get only the last door record
             itemsSorted.map((item) => {
-                const index = _.findIndex(floors, { doorId: item.doorId, floorId: item.floorId });
+                const index = _.findIndex(floors, {
+                    doorId: item.doorId,
+                    floorId: item.floorId
+                });
                 if (index === -1) {
                     floors.push(item);
                 }
             });
 
             // get open doors
-            floors.map((floor) => {
-                openFloorTxt += `Elm F${floor.floorId}\n`
-            });
+            let result = '';
+            let availList = {};
+            let unAvailList = [];
+
+            for (let i = 0; i < array.length; i++) {
+                if (array[i].status === 1) {
+                    if (availList[array[i].floorId]) {
+                        availList[array[i].floorId]++
+                    } else {
+                        availList[array[i].floorId] = 1
+                    }
+                } else {
+                    unAvailList.push(array[i].floorId);
+                }
+            }
+
+            for (var key in availList) {
+                let str = "F" + key + ": " + availList[key] + " available\n"
+                result += str
+            }
+
+            openFloorTxt = result.slice(0, result.length - 1);
 
             let res = {
                 "text": "Available Bathrooms: ",
-                "attachments": [
-                    {
-                        "text": openFloorTxt,
-                        "callback_id": "notify",
-                        "color": "#3AA3E3",
-                        "attachment_type": "default",
-                        "actions": [
-                            {
-                                "name": "notify",
-                                "text": "Notify All",
-                                "style": "danger",
-                                "type": "button",
-                                "value": "all"
-                            },
-                            {
-                                "name": "notify",
-                                "text": "Notify F1",
-                                "type": "button",
-                                "value": "F1"
-                            },
-                            {
-                                "name": "notify",
-                                "text": "Notify F2",
-                                "type": "button",
-                                "value": "F2"
-                            },
-                            {
-                                "name": "notify",
-                                "text": "Notify F3",
-                                "type": "button",
-                                "value": "F3"
-                            }
-                        ]
-                    }
-                ]
+                "attachments": [{
+                    "text": openFloorTxt,
+                    "callback_id": "notify",
+                    "color": "#3AA3E3",
+                    "attachment_type": "default",
+                    "actions": [{
+                            "name": "notify",
+                            "text": "Notify All",
+                            "style": "danger",
+                            "type": "button",
+                            "value": "all"
+                        },
+                        {
+                            "name": "notify",
+                            "text": "Notify F1",
+                            "type": "button",
+                            "value": "F1"
+                        },
+                        {
+                            "name": "notify",
+                            "text": "Notify F2",
+                            "type": "button",
+                            "value": "F2"
+                        },
+                        {
+                            "name": "notify",
+                            "text": "Notify F3",
+                            "type": "button",
+                            "value": "F3"
+                        }
+                    ]
+                }]
             };
 
             callback(null, res);
@@ -293,11 +324,21 @@ module.exports.slackStatusNotify = (event, context, callback) => {
     const params = {
         TableName: dbTableNameUser,
         Item: {
-            'id': { S: uuid.v1() },
-            'userId': { S: data.user.id },
-            'userName': { S: data.user.name },
-            'action': { S: data.actions[0].value },
-            'dt': { S: new Date().getTime().toString() }
+            'id': {
+                S: uuid.v1()
+            },
+            'userId': {
+                N: data.payload.user.id
+            },
+            'user': {
+                S: data.payload.user.user
+            },
+            'action': {
+                S: data.actions[0].value
+            },
+            'dt': {
+                S: new Date().getTime().toString()
+            }
         }
     };
     const dynamoDb = new AWS.DynamoDB();
@@ -310,4 +351,61 @@ module.exports.slackStatusNotify = (event, context, callback) => {
         }
     });
 
+}
+
+const availableGifs = [
+    'https://giphy.com/gifs/excited-screaming-jonah-hill-5GoVLqeAOo6PK',
+    'https://giphy.com/gifs/excited-yes-nicolas-cage-RrVzUOXldFe8M',
+    'https://giphy.com/gifs/JltOMwYmi0VrO',
+    'https://giphy.com/gifs/mrw-wall-thedonald-WUq1cg9K7uzHa',
+    'https://giphy.com/gifs/friends-excited-31lPv5L3aIvTi',
+    'https://giphy.com/gifs/excited-oprah-shouting-y8Mz1yj13s3kI',
+    'https://giphy.com/gifs/excited-fx-charlie-3oKIP9iTS7Ze73m1P2',
+    'https://giphy.com/gifs/seinfeld-preseason-aMh59aKR8vjdC',
+    'https://giphy.com/gifs/carlton-fresh-prince-dance-3o7abldj0b3rxrZUxW',
+    'https://giphy.com/gifs/wwe-wrestling-excited-cbG9wtoO8QScw',
+    'https://giphy.com/gifs/excited-jessica-chastain-finally-yIsbuPCEOgNHO',
+    'https://giphy.com/gifs/yes-applause-shakira-13mbTHVskEHyGA',
+    'https://giphy.com/gifs/finally-its-about-time-took-long-enough-AuwBPJztsEWkw',
+    'https://giphy.com/gifs/yes-agree-totes-sIfvjuG26APYI'
+];
+
+const oneAvailableGifs = [
+    'https://giphy.com/gifs/run-forrest-gump-l2Sqc3POpzkj5r8SQ',
+    'https://giphy.com/gifs/rockymovie-movie-rocky-sylvester-stallone-1iTH1WIUjM0VATSw',
+    'https://giphy.com/gifs/breakingbad-run-breaking-bad-l0HUjziiiniIsRUY0',
+    'https://giphy.com/gifs/running-muppets-7kn27lnYSAE9O',
+    'https://giphy.com/gifs/tvonetv-scared-run-3oKIPoZniJ2hq8IItG',
+    'https://giphy.com/gifs/filmeditor-christmas-movies-the-polar-express-3otPotP0eZDYu3sPpm',
+    'https://giphy.com/gifs/pizza-bored-april-ludgate-wAClK9HIiBdBu',
+    'https://giphy.com/gifs/kuFDac2MnJN2U',
+    'https://giphy.com/gifs/judge-judy-hurry-up-Emg9qPKR5hquI',
+    'https://giphy.com/gifs/hurry-6QXdPW7qzTVxC',
+    'https://giphy.com/gifs/ufc-mma-ufc-205-l2SpMwIcaPAVg8dnq',
+    'https://giphy.com/gifs/jeff-goldblum-jurassic-park-jurassicparkedit-7XsFGzfP6WmC4',
+    'https://giphy.com/gifs/hells-kitchen-fox-gordon-ramsay-l4pT47HmuSgXIyXbq'
+];
+
+const noneAvailableGifs = [
+    'https://giphy.com/gifs/angry-the-office-screaming-3t7RAFhu75Wwg',
+    'https://giphy.com/gifs/funny-LX5lCAnX1yais',
+    'https://giphy.com/gifs/angry-frustrated-lizzie-mcguire-ug9SeZBFLKHtK',
+    'https://giphy.com/gifs/snl-l3978hPCi5iREQk5W',
+    'https://giphy.com/gifs/reactiongifs-Rhkq4ehWqVX56',
+    'https://giphy.com/gifs/sad-not-fair-crying-CMRWlA55AYLpS',
+    'https://giphy.com/gifs/made-frank-creator-jSfiX3lj42RDG',
+    'https://giphy.com/gifs/teamcoco-crying-cry-l2JhtKtDWYNKdRpoA',
+    'https://giphy.com/gifs/angry-mad-classic-8pMS5BXOUVZyo',
+    'https://giphy.com/gifs/angry-mad-frustrated-xUOxfeS1G9NTxN02Ag',
+    'https://giphy.com/gifs/KDRv3QggAjyo',
+    'https://giphy.com/gifs/mrw-song-myself-Ty9Sg8oHghPWg',
+    'https://giphy.com/gifs/hells-kitchen-hells-kitchen-gordon-ramsay-l3V0H7bYv5Ml5TOfu',
+    'https://giphy.com/gifs/eye-roll-ryan-reynolds-ugh-54PaD9dWT0go',
+    'https://giphy.com/gifs/friends-why-frustrated-4qmcuu67Hxx0Q',
+    'https://giphy.com/gifs/mrw-reddit-comment-tJeGZumxDB01q',
+    'https://giphy.com/gifs/partner-put-ilkfz8Mn5Yz7O'
+];
+
+const getRandomInt = (max) => {
+    return Math.floor(Math.random() * Math.floor(max));
 }
