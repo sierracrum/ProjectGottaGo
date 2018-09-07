@@ -270,7 +270,7 @@ module.exports.slackStatus = (event, context, callback) => {
             }
 
             for (var key in availList) {
-                let str = "F" + key + ": " + availList[key] + " available\n"
+                let str = "Floor " + key + ": " + availList[key] + " available\n"
                 result += str
             }
 
