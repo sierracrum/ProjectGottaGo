@@ -372,7 +372,7 @@ module.exports.slackStatusNotify = (event, context, callback) => {
             console.log(error);
             callback('Failed storing status', error);
         } else {
-            callback(null, "I will notify you when a bathroom opens up");
+            callback(null, 'I will notify you when a bathroom opens up');
         }
     });
 
