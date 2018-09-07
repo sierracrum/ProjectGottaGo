@@ -193,24 +193,24 @@ module.exports.createStatus = (event, context, callback) => {
                             console.log(error);
                             callback('Failed fetching users', error);
                         } else {*/
-                            
-                             // axios.post(`https://slack.com/api/im.open?token=${process.env.SLACK_TOKEN}&user=UCN0W2FQR`, {
-                            //     headers: {
-                            //         'Content-Type': 'application/json'
-                            //     }
-                            // }).then((res) => {
-                            //     console.log('open res', res);
-                            //     axios.post(`https://slack.com/api/chat.postMessage?token=${process.env.SLACK_TOKEN}&channel=${res.data.channel.id}&text=Bathroom F1 is open`)
-                            //     .then((res) => {
-                            //         console.log('msg res', res)
-                            //     });
-                            // });
 
-                            // all done
-                            callback(null, true);
+                    // axios.post(`https://slack.com/api/im.open?token=${process.env.SLACK_TOKEN}&user=UCN0W2FQR`, {
+                    //     headers: {
+                    //         'Content-Type': 'application/json'
+                    //     }
+                    // }).then((res) => {
+                    //     console.log('open res', res);
+                    //     axios.post(`https://slack.com/api/chat.postMessage?token=${process.env.SLACK_TOKEN}&channel=${res.data.channel.id}&text=Bathroom F1 is open`)
+                    //     .then((res) => {
+                    //         console.log('msg res', res)
+                    //     });
+                    // });
+
+                    // all done
+                    callback(null, true);
 
 
-                        //}
+                    //}
 
                     //});
 
@@ -271,13 +271,13 @@ module.exports.slackStatus = (event, context, callback) => {
                     floors.push(item);
                 }
             });
-            
-            
+
+
             // // get open doors
-            let resultTxt = '';
             let availList = {};
+            let availText = '';
             let unAvailList = [];
-            
+
             for (let i = 0; i < floors.length; i++) {
                 if (floors[i].status === 1) {
                     if (availList[floors[i].floorId]) {
@@ -292,15 +292,31 @@ module.exports.slackStatus = (event, context, callback) => {
 
             for (var key in availList) {
                 let str = "Floor " + key + ": " + availList[key] + " available\n"
-                result += str
+                availText += str
+            }
+            availText += "\n"
+
+            let gifURL = '';
+            let resultTitle = '';
+            switch (Object.keys(availList).length) {
+                case 0:
+                    resultTitle = "Gotta wait, no bathrooms are available!"
+                    gifURL = _.sample(noneAvailableGifs)
+                    break;
+                case 1:
+                    resultTitle = "Gotta hurry, one bathrooms is available!"
+                    gifURL = _.sample(oneAvailableGifs)
+                    break;
+                default:
+                    resultTitle = "Gotta choose, there are multiple bathrooms available!"
+                    gifURL = _.sample(availableGifs)
             }
 
-            openFloorTxt = resultTxt.slice(0, resultTxt.length - 1);
-
             let res = {
-                "text": "There are bathrooms available!",
+                "text": resultTitle,
                 "attachments": [{
-                    "text": openFloorTxt,
+                    "text": availText,
+                    "image_url": gifURL,
                     "callback_id": "notify",
                     "color": "good",
                     "attachment_type": "default",
