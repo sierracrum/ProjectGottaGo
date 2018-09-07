@@ -291,8 +291,8 @@ module.exports.slackStatus = (event, context, callback) => {
             }
 
             for (var key in availList) {
-                let str = "F" + key + ": " + availList[key] + " available\n";
-                resultTxt += str;
+                let str = "Floor " + key + ": " + availList[key] + " available\n"
+                result += str
             }
 
             openFloorTxt = resultTxt.slice(0, resultTxt.length - 1);
