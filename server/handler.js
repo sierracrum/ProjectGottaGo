@@ -134,7 +134,58 @@ module.exports.createStatus = (event, context, callback) => {
             console.log(error);
             callback('Failed storing status', error);
         } else {
-            callback(null, true);
+            // get users by active 0
+            const params = {
+                TableName: dbTableNameUser,
+                AttributesToGet: [
+                    'id',
+                    'userId',
+                    'userName',
+                    'dt'
+                ]
+            };
+            dynamoDb.scan(params, (error, result) => {
+                if (error) {
+                    console.log(error);
+                    callback('Failed fetching users', error);
+                } else {
+                    
+                    // send notification
+                    /*result.Items.map((user) => {
+                        const userName = user.userName.S;
+                        const userId = user.userId.S;
+                        const id = user.userId.S;
+                        const action = user.action.S;
+                    });
+
+                    // delete user
+                    var params = {
+                        TableName: dbTableNameUser,
+                        Key: { "id": {
+                                "S" : result.Items[0].id.S.toString()
+                            }
+                        }
+                    };
+
+                    dynamoDb.deleteItem(params, function(err, data) {
+                        
+                        if (error) {
+                            console.log(error);
+                            callback('Failed fetching users', error);
+                        } else {*/
+
+
+                            // all done
+                            callback(null, true);
+
+
+                        //}
+
+                    //});
+
+                    
+                }
+            });
         }
     });
 }
@@ -189,7 +240,7 @@ module.exports.slackStatus = (event, context, callback) => {
             // get open doors
             floors.map((floor) => {
                 openFloorTxt += `Elm F${floor.floorId}\n`
-            })
+            });
 
             let res = {
                 "text": "Available Bathrooms: ",
@@ -237,15 +288,14 @@ module.exports.slackStatus = (event, context, callback) => {
 }
 
 module.exports.slackStatusNotify = (event, context, callback) => {
-    callback(null, event.body);
-
-    const data = JSON.parse(event.body);
+    const data = JSON.parse(event.body.payload);
+    console.log(data);
     const params = {
         TableName: dbTableNameUser,
         Item: {
             'id': { S: uuid.v1() },
-            'userId': { N: data.payload.user.id },
-            'user': { S: data.payload.user.user },
+            'userId': { S: data.user.id },
+            'userName': { S: data.user.name },
             'action': { S: data.actions[0].value },
             'dt': { S: new Date().getTime().toString() }
         }
