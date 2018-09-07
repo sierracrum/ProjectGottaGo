@@ -313,17 +313,17 @@ module.exports.slackStatus = (event, context, callback) => {
             }
 
             let res = {
-                "text": resultTitle,
+
                 "attachments": [{
+                    "pretext": resultTitle,
                     "text": availText,
-                    "image_url": gifURL,
                     "callback_id": "notify",
                     "color": "good",
                     "attachment_type": "default",
                     "actions": [
                         {
                             "name": "notify",
-                            "text": "Choose a notify option.",
+                            "text": "Notify option...",
                             "type": "select",
                             "options": [
                                 {
@@ -345,7 +345,13 @@ module.exports.slackStatus = (event, context, callback) => {
                             ]
                         }
                     ]
-                }]
+                },
+                {
+                    "text": "GottaGo",
+                    "image_url": gifURL,
+                }
+                ]
+
             }
 
             callback(null, res);
