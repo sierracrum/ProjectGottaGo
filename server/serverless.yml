@@ -11,6 +11,7 @@ custom:
       - R_AWS_KEY
       - R_AWS_SECRET
       - AUTH_TOKEN
+      - SLACK_TOKEN
 
 provider:
   name: aws

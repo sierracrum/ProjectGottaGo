@@ -1,6 +1,7 @@
 const AWS = require("aws-sdk");
 const uuid = require("uuid");
 const _ = require("lodash");
+const axios = require("axios");
 const dbTableNameStatus = "risk-gtg-status";
 const dbTableNameUser = "risk-gtg-user";
 // const dynamoDb = require('./db/dynamodb');
@@ -168,6 +169,13 @@ module.exports.createStatus = (event, context, callback) => {
                         const userId = user.userId.S;
                         const id = user.userId.S;
                         const action = user.action.S;
+
+                        // check user action
+
+                        // if any notify
+
+                        // if action is floor, match the door to what got submitted
+
                     });
 
                     // delete user
@@ -185,13 +193,24 @@ module.exports.createStatus = (event, context, callback) => {
                             console.log(error);
                             callback('Failed fetching users', error);
                         } else {*/
+                            
+                             // axios.post(`https://slack.com/api/im.open?token=${process.env.SLACK_TOKEN}&user=UCN0W2FQR`, {
+                            //     headers: {
+                            //         'Content-Type': 'application/json'
+                            //     }
+                            // }).then((res) => {
+                            //     console.log('open res', res);
+                            //     axios.post(`https://slack.com/api/chat.postMessage?token=${process.env.SLACK_TOKEN}&channel=${res.data.channel.id}&text=Bathroom F1 is open`)
+                            //     .then((res) => {
+                            //         console.log('msg res', res)
+                            //     });
+                            // });
+
+                            // all done
+                            callback(null, true);
 
 
-                    // all done
-                    callback(null, true);
-
-
-                    //}
+                        //}
 
                     //});
 
@@ -228,6 +247,7 @@ module.exports.slackStatus = (event, context, callback) => {
             let openFloorTxt = '';
             let items = [];
 
+
             // sort
             result.Items.map((item) => {
                 items.push({
@@ -241,7 +261,7 @@ module.exports.slackStatus = (event, context, callback) => {
             });
             const itemsSorted = _.sortBy(items, 'dt').reverse();
 
-            // get only the last door record
+            // // get only the last door record
             itemsSorted.map((item) => {
                 const index = _.findIndex(floors, {
                     doorId: item.doorId,
@@ -251,21 +271,22 @@ module.exports.slackStatus = (event, context, callback) => {
                     floors.push(item);
                 }
             });
-
-            // get open doors
-            let result = '';
+            
+            
+            // // get open doors
+            let resultTxt = '';
             let availList = {};
             let unAvailList = [];
-
-            for (let i = 0; i < array.length; i++) {
-                if (array[i].status === 1) {
-                    if (availList[array[i].floorId]) {
-                        availList[array[i].floorId]++
+            
+            for (let i = 0; i < floors.length; i++) {
+                if (floors[i].status === 1) {
+                    if (availList[floors[i].floorId]) {
+                        availList[floors[i].floorId]++;
                     } else {
-                        availList[array[i].floorId] = 1
+                        availList[floors[i].floorId] = 1;
                     }
                 } else {
-                    unAvailList.push(array[i].floorId);
+                    unAvailList.push(floors[i].floorId);
                 }
             }
 
@@ -274,7 +295,7 @@ module.exports.slackStatus = (event, context, callback) => {
                 result += str
             }
 
-            openFloorTxt = result.slice(0, result.length - 1);
+            openFloorTxt = resultTxt.slice(0, resultTxt.length - 1);
 
             let res = {
                 "text": "There are bathrooms available!",
@@ -329,8 +350,8 @@ module.exports.slackStatusNotify = (event, context, callback) => {
             'userId': {
                 N: data.payload.user.id
             },
-            'user': {
-                S: data.payload.user.user
+            'userName': {
+                S: data.payload.user.name
             },
             'action': {
                 S: data.actions[0].value
