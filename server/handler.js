@@ -193,13 +193,24 @@ module.exports.createStatus = (event, context, callback) => {
                             console.log(error);
                             callback('Failed fetching users', error);
                         } else {*/
+                            
+                             // axios.post(`https://slack.com/api/im.open?token=${process.env.SLACK_TOKEN}&user=UCN0W2FQR`, {
+                            //     headers: {
+                            //         'Content-Type': 'application/json'
+                            //     }
+                            // }).then((res) => {
+                            //     console.log('open res', res);
+                            //     axios.post(`https://slack.com/api/chat.postMessage?token=${process.env.SLACK_TOKEN}&channel=${res.data.channel.id}&text=Bathroom F1 is open`)
+                            //     .then((res) => {
+                            //         console.log('msg res', res)
+                            //     });
+                            // });
+
+                            // all done
+                            callback(null, true);
 
 
-                    // all done
-                    callback(null, true);
-
-
-                    //}
+                        //}
 
                     //});
 
