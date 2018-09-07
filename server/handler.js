@@ -323,7 +323,7 @@ module.exports.slackStatus = (event, context, callback) => {
                     "actions": [
                         {
                             "name": "notify",
-                            "text": "Notify option...",
+                            "text": "Notify options...",
                             "type": "select",
                             "options": [
                                 {
