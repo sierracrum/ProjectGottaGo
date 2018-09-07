@@ -4,6 +4,7 @@ const _ = require("lodash");
 const axios = require("axios");
 const dbTableNameStatus = "risk-gtg-status";
 const dbTableNameUser = "risk-gtg-user";
+const notificationLib = require("./libs/notifications");;
 // const dynamoDb = require('./db/dynamodb');
 AWS.config.update({
     region: process.env.R_AWS_REGION,
@@ -163,57 +164,35 @@ module.exports.createStatus = (event, context, callback) => {
                     callback('Failed fetching users', error);
                 } else {
 
-                    // send notification
-                    /*result.Items.map((user) => {
-                        const userName = user.userName.S;
-                        const userId = user.userId.S;
-                        const id = user.userId.S;
-                        const action = user.action.S;
+                    // build messages
+                    const messages = notificationLib.getUserMessages(result.Items, data.floorId);
+                    if (messages.length) {
+                        notificationLib.sendNotifications(messages, data.floorId, (error, res) => {
 
-                        // check user action
+                            if (error) {
+                                console.log(error);
+                                callback('Failed sending messages', error);
+                            } else {
+                                
+                                notificationLib.deleteUsers(messages, dynamoDb, (error, res) => {
 
-                        // if any notify
+                                    if (error) {
+                                        console.log(error);
+                                        callback('Failed deleting users', error);
+                                    } else {
+                                        
+                                        callback(null, true);
 
-                        // if action is floor, match the door to what got submitted
+                                    }
 
-                    });
+                                });
 
-                    // delete user
-                    var params = {
-                        TableName: dbTableNameUser,
-                        Key: { "id": {
-                                "S" : result.Items[0].id.S.toString()
                             }
-                        }
-                    };
 
-                    dynamoDb.deleteItem(params, function(err, data) {
-                        
-                        if (error) {
-                            console.log(error);
-                            callback('Failed fetching users', error);
-                        } else {*/
-
-                    // axios.post(`https://slack.com/api/im.open?token=${process.env.SLACK_TOKEN}&user=UCN0W2FQR`, {
-                    //     headers: {
-                    //         'Content-Type': 'application/json'
-                    //     }
-                    // }).then((res) => {
-                    //     console.log('open res', res);
-                    //     axios.post(`https://slack.com/api/chat.postMessage?token=${process.env.SLACK_TOKEN}&channel=${res.data.channel.id}&text=Bathroom F1 is open`)
-                    //     .then((res) => {
-                    //         console.log('msg res', res)
-                    //     });
-                    // });
-
-                    // all done
-                    callback(null, true);
-
-
-                    //}
-
-                    //});
-
+                        });
+                    } else {
+                        callback(null, true);
+                    }
 
                 }
             });
