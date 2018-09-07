@@ -162,18 +162,6 @@ module.exports.createStatus = (event, context, callback) => {
                     console.log(error);
                     callback('Failed fetching users', error);
                 } else {
-                    
-                    // axios.post(`https://slack.com/api/im.open?token=${process.env.SLACK_TOKEN}&user=UCN0W2FQR`, {
-                    //     headers: {
-                    //         'Content-Type': 'application/json'
-                    //     }
-                    // }).then((res) => {
-                    //     console.log('open res', res);
-                    //     axios.post(`https://slack.com/api/chat.postMessage?token=${process.env.SLACK_TOKEN}&channel=${res.data.channel.id}&text=Bathroom F1 is open`)
-                    //     .then((res) => {
-                    //         console.log('msg res', res)
-                    //     });
-                    // });
 
                     // send notification
                     /*result.Items.map((user) => {
@@ -206,14 +194,16 @@ module.exports.createStatus = (event, context, callback) => {
                             callback('Failed fetching users', error);
                         } else {*/
 
-                            // all done
-                            callback(null, true);
 
-                        //}
+                    // all done
+                    callback(null, true);
+
+
+                    //}
 
                     //});
 
-                    
+
                 }
             });
         }
@@ -297,40 +287,39 @@ module.exports.slackStatus = (event, context, callback) => {
             openFloorTxt = resultTxt.slice(0, resultTxt.length - 1);
 
             let res = {
-                "text": "Available Bathrooms: ",
+                "text": "There are bathrooms available!",
                 "attachments": [{
                     "text": openFloorTxt,
                     "callback_id": "notify",
-                    "color": "#3AA3E3",
+                    "color": "good",
                     "attachment_type": "default",
-                    "actions": [{
-                            "name": "notify",
-                            "text": "Notify All",
-                            "style": "danger",
-                            "type": "button",
-                            "value": "all"
-                        },
+                    "actions": [
                         {
                             "name": "notify",
-                            "text": "Notify F1",
-                            "type": "button",
-                            "value": "F1"
-                        },
-                        {
-                            "name": "notify",
-                            "text": "Notify F2",
-                            "type": "button",
-                            "value": "F2"
-                        },
-                        {
-                            "name": "notify",
-                            "text": "Notify F3",
-                            "type": "button",
-                            "value": "F3"
+                            "text": "Choose a notify option.",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "text": "Any",
+                                    "value": "any"
+                                },
+                                {
+                                    "text": "1st Floor",
+                                    "value": "1"
+                                },
+                                {
+                                    "text": "2nd Floor",
+                                    "value": "2"
+                                },
+                                {
+                                    "text": "3rd Floor",
+                                    "value": "3"
+                                }
+                            ]
                         }
                     ]
                 }]
-            };
+            }
 
             callback(null, res);
         }
