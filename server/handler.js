@@ -161,7 +161,7 @@ module.exports.createStatus = (event, context, callback) => {
                     console.log(error);
                     callback('Failed fetching users', error);
                 } else {
-                    
+
                     // send notification
                     /*result.Items.map((user) => {
                         const userName = user.userName.S;
@@ -187,15 +187,15 @@ module.exports.createStatus = (event, context, callback) => {
                         } else {*/
 
 
-                            // all done
-                            callback(null, true);
+                    // all done
+                    callback(null, true);
 
 
-                        //}
+                    //}
 
                     //});
 
-                    
+
                 }
             });
         }
@@ -277,40 +277,39 @@ module.exports.slackStatus = (event, context, callback) => {
             openFloorTxt = result.slice(0, result.length - 1);
 
             let res = {
-                "text": "Available Bathrooms: ",
+                "text": "There are bathrooms available!",
                 "attachments": [{
                     "text": openFloorTxt,
                     "callback_id": "notify",
-                    "color": "#3AA3E3",
+                    "color": "good",
                     "attachment_type": "default",
-                    "actions": [{
-                            "name": "notify",
-                            "text": "Notify All",
-                            "style": "danger",
-                            "type": "button",
-                            "value": "all"
-                        },
+                    "actions": [
                         {
                             "name": "notify",
-                            "text": "Notify F1",
-                            "type": "button",
-                            "value": "F1"
-                        },
-                        {
-                            "name": "notify",
-                            "text": "Notify F2",
-                            "type": "button",
-                            "value": "F2"
-                        },
-                        {
-                            "name": "notify",
-                            "text": "Notify F3",
-                            "type": "button",
-                            "value": "F3"
+                            "text": "Choose a notify option.",
+                            "type": "select",
+                            "options": [
+                                {
+                                    "text": "Any",
+                                    "value": "any"
+                                },
+                                {
+                                    "text": "1st Floor",
+                                    "value": "1"
+                                },
+                                {
+                                    "text": "2nd Floor",
+                                    "value": "2"
+                                },
+                                {
+                                    "text": "3rd Floor",
+                                    "value": "3"
+                                }
+                            ]
                         }
                     ]
                 }]
-            };
+            }
 
             callback(null, res);
         }
